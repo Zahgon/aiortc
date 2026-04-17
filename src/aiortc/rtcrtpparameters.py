@@ -22,7 +22,7 @@ class RTCRtpCodecCapability:
 
     @property
     def name(self) -> str:
-        return self.mimeType.split("/")[1]
+        pass
 
 
 @dataclass
@@ -47,7 +47,7 @@ class RTCRtpCodecParameters:
 
     @property
     def name(self) -> str:
-        return self.mimeType.split("/")[1]
+        pass
 
     def __str__(self) -> str:
         s = f"{self.name}/{self.clockRate}"

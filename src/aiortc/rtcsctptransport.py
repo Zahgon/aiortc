@@ -80,24 +80,11 @@ def chunk_type(chunk: "Chunk") -> str:
 
 
 def decode_params(body: bytes) -> list[tuple[int, bytes]]:
-    params = []
-    pos = 0
-    while pos <= len(body) - 4:
-        param_type, param_length = unpack_from("!HH", body, pos)
-        params.append((param_type, body[pos + 4 : pos + param_length]))
-        pos += param_length + padl(param_length)
-    return params
+    pass
 
 
 def encode_params(params: list[tuple[int, bytes]]) -> bytes:
-    body = b""
-    padding = b""
-    for param_type, param_value in params:
-        param_length = len(param_value) + 4
-        body += padding
-        body += pack("!HH", param_type, param_length) + param_value
-        padding = b"\x00" * padl(param_length)
-    return body
+    pass
 
 
 def padl(length: int) -> int:
@@ -140,7 +127,7 @@ class BaseParamsChunk(Chunk):
 
     @property
     def body(self) -> bytes:  # type: ignore
-        return encode_params(self.params)
+        pass
 
 
 class AbortChunk(BaseParamsChunk):
@@ -231,10 +218,7 @@ class ForwardTsnChunk(Chunk):
 
     @property
     def body(self) -> bytes:  # type: ignore
-        body = pack("!L", self.cumulative_tsn)
-        for stream_id, stream_seq in self.streams:
-            body += pack("!HH", stream_id, stream_seq)
-        return body
+        pass
 
     def __repr__(self) -> str:
         return (
@@ -273,16 +257,7 @@ class BaseInitChunk(Chunk):
 
     @property
     def body(self) -> bytes:  # type: ignore
-        body = pack(
-            "!LLHHL",
-            self.initiate_tag,
-            self.advertised_rwnd,
-            self.outbound_streams,
-            self.inbound_streams,
-            self.initial_tsn,
-        )
-        body += encode_params(self.params)
-        return body
+        pass
 
 
 class InitChunk(BaseInitChunk):
@@ -359,7 +334,7 @@ class ShutdownChunk(Chunk):
 
     @property
     def body(self) -> bytes:  # type: ignore
-        return pack("!L", self.cumulative_tsn)
+        pass
 
     def __repr__(self) -> str:
         return (
@@ -682,23 +657,21 @@ class RTCSctpTransport(AsyncIOEventEmitter):
 
     @property
     def is_server(self) -> bool:
-        return self.transport.transport.role != "controlling"
+        pass
 
     @property
     def maxChannels(self) -> Optional[int]:
         """
         The maximum number of :class:`RTCDataChannel` that can be used simultaneously.
         """
-        if self._inbound_streams_count:
-            return min(self._inbound_streams_count, self._outbound_streams_count)
-        return None
+        pass
 
     @property
     def port(self) -> int:
         """
         The local SCTP port number used for data channels.
         """
-        return self._local_port
+        pass
 
     @property
     def state(self) -> str:
@@ -712,7 +685,7 @@ class RTCSctpTransport(AsyncIOEventEmitter):
         """
         The :class:`RTCDtlsTransport` over which SCTP data is transmitted.
         """
-        return self.__transport
+        pass
 
     @classmethod
     def getCapabilities(cls) -> RTCSctpCapabilities:
@@ -721,10 +694,10 @@ class RTCSctpTransport(AsyncIOEventEmitter):
 
         :rtype: RTCSctpCapabilities
         """
-        return RTCSctpCapabilities(maxMessageSize=65536)
+        pass
 
     def setTransport(self, transport: RTCDtlsTransport) -> None:
-        self.__transport = transport
+        pass
 
     async def start(self, remoteCaps: RTCSctpCapabilities, remotePort: int) -> None:
         """
@@ -912,7 +885,7 @@ class RTCSctpTransport(AsyncIOEventEmitter):
 
         # filter out obsolete entries
         def is_obsolete(x: int) -> bool:
-            return uint32_gt(x, self._last_received_tsn)
+            pass
 
         self._sack_duplicates = list(filter(is_obsolete, self._sack_duplicates))
         self._sack_misordered = set(filter(is_obsolete, self._sack_misordered))
@@ -1105,7 +1078,7 @@ class RTCSctpTransport(AsyncIOEventEmitter):
             return
 
         def is_obsolete(x: int) -> bool:
-            return uint32_gt(x, self._last_received_tsn)
+            pass
 
         # advance cumulative TSN
         self._last_received_tsn = chunk.cumulative_tsn
@@ -1432,16 +1405,7 @@ class RTCSctpTransport(AsyncIOEventEmitter):
             self._t1_chunk = None
 
     def _t1_expired(self) -> None:
-        self._t1_failures += 1
-        self._t1_handle = None
-        self.__log_debug(
-            "x T1(%s) expired %d", chunk_type(self._t1_chunk), self._t1_failures
-        )
-        if self._t1_failures > SCTP_MAX_INIT_RETRANS:
-            self._set_state(self.State.CLOSED)
-        else:
-            asyncio.ensure_future(self._send_chunk(self._t1_chunk))
-            self._t1_handle = self._loop.call_later(self._rto, self._t1_expired)
+        pass
 
     def _t1_start(self, chunk: Chunk) -> None:
         assert self._t1_handle is None
@@ -1458,16 +1422,7 @@ class RTCSctpTransport(AsyncIOEventEmitter):
             self._t2_chunk = None
 
     def _t2_expired(self) -> None:
-        self._t2_failures += 1
-        self._t2_handle = None
-        self.__log_debug(
-            "x T2(%s) expired %d", chunk_type(self._t2_chunk), self._t2_failures
-        )
-        if self._t2_failures > SCTP_MAX_ASSOCIATION_RETRANS:
-            self._set_state(self.State.CLOSED)
-        else:
-            asyncio.ensure_future(self._send_chunk(self._t2_chunk))
-            self._t2_handle = self._loop.call_later(self._rto, self._t2_expired)
+        pass
 
     def _t2_start(self, chunk: ShutdownAckChunk) -> None:
         assert self._t2_handle is None
@@ -1477,24 +1432,7 @@ class RTCSctpTransport(AsyncIOEventEmitter):
         self._t2_handle = self._loop.call_later(self._rto, self._t2_expired)
 
     def _t3_expired(self) -> None:
-        self._t3_handle = None
-        self.__log_debug("x T3 expired")
-
-        # mark retransmit or abandoned chunks
-        for chunk in self._sent_queue:
-            if not self._maybe_abandon(chunk):
-                chunk._retransmit = True
-        self._update_advanced_peer_ack_point()
-
-        # adjust congestion window
-        self._fast_recovery_exit = None
-        self._flight_size = 0
-        self._partial_bytes_acked = 0
-
-        self._ssthresh = max(self._cwnd // 2, 4 * USERDATA_MAX_LENGTH)
-        self._cwnd = USERDATA_MAX_LENGTH
-
-        asyncio.ensure_future(self._transmit())
+        pass
 
     def _t3_restart(self) -> None:
         self.__log_debug("- T3 restart")
@@ -1693,49 +1631,10 @@ class RTCSctpTransport(AsyncIOEventEmitter):
                 channel._addBufferedAmount(-len(user_data))
 
     def _data_channel_add_negotiated(self, channel: RTCDataChannel) -> None:
-        if channel.id in self._data_channels:
-            raise ValueError(f"Data channel with ID {channel.id} already registered")
-
-        self._data_channels[channel.id] = channel
-
-        if self._association_state == self.State.ESTABLISHED:
-            channel._setReadyState("open")
+        pass
 
     def _data_channel_open(self, channel: RTCDataChannel) -> None:
-        if channel.id is not None:
-            if channel.id in self._data_channels:
-                raise ValueError(
-                    f"Data channel with ID {channel.id} already registered"
-                )
-            else:
-                self._data_channels[channel.id] = channel
-
-        channel_type = DATA_CHANNEL_RELIABLE
-        priority = 0
-        reliability = 0
-
-        if not channel.ordered:
-            channel_type |= 0x80
-        if channel.maxRetransmits is not None:
-            channel_type |= 1
-            reliability = channel.maxRetransmits
-        elif channel.maxPacketLifeTime is not None:
-            channel_type |= 2
-            reliability = channel.maxPacketLifeTime
-
-        data = pack(
-            "!BBHLHH",
-            DATA_CHANNEL_OPEN,
-            channel_type,
-            priority,
-            reliability,
-            len(channel.label),
-            len(channel.protocol),
-        )
-        data += channel.label.encode("utf8")
-        data += channel.protocol.encode("utf8")
-        self._data_channel_queue.append((channel, WEBRTC_DCEP, data))
-        asyncio.ensure_future(self._data_channel_flush())
+        pass
 
     async def _data_channel_receive(
         self, stream_id: int, pp_id: int, data: bytes

@@ -25,7 +25,7 @@ class JitterBuffer:
 
     @property
     def capacity(self) -> int:
-        return self._capacity
+        pass
 
     def add(self, packet: RtpPacket) -> tuple[bool, Optional[JitterFrame]]:
         pli_flag = False

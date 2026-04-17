@@ -65,8 +65,7 @@ class MediaBlackhole:
 
         :param track: A :class:`aiortc.MediaStreamTrack`.
         """
-        if track not in self.__tracks:
-            self.__tracks[track] = None
+        pass
 
     async def start(self) -> None:
         """
@@ -96,66 +95,7 @@ def player_worker_decode(
     throttle_playback: bool,
     loop_playback: bool,
 ) -> None:
-    audio_sample_rate = 48000
-    audio_samples = 0
-    audio_time_base = fractions.Fraction(1, audio_sample_rate)
-    audio_resampler = av.AudioResampler(
-        format="s16",
-        layout="stereo",
-        rate=audio_sample_rate,
-        frame_size=int(audio_sample_rate * AUDIO_PTIME),
-    )
-
-    video_first_pts = None
-
-    frame_time = None
-    start_time = time.time()
-
-    while not quit_event.is_set():
-        try:
-            frame = next(container.decode(*streams))
-        except Exception as exc:
-            if isinstance(exc, av.FFmpegError) and exc.errno == errno.EAGAIN:
-                time.sleep(0.01)
-                continue
-            if isinstance(exc, StopIteration) and loop_playback:
-                container.seek(0)
-                continue
-            if audio_track:
-                asyncio.run_coroutine_threadsafe(audio_track._queue.put(None), loop)
-            if video_track:
-                asyncio.run_coroutine_threadsafe(video_track._queue.put(None), loop)
-            break
-
-        # read up to 1 second ahead
-        if throttle_playback:
-            elapsed_time = time.time() - start_time
-            if frame_time and frame_time > elapsed_time + 1:
-                time.sleep(0.1)
-
-        if isinstance(frame, AudioFrame) and audio_track:
-            for frame in audio_resampler.resample(frame):
-                # fix timestamps
-                frame.pts = audio_samples
-                frame.time_base = audio_time_base
-                audio_samples += frame.samples
-
-                frame_time = frame.time
-                asyncio.run_coroutine_threadsafe(audio_track._queue.put(frame), loop)
-        elif isinstance(frame, VideoFrame) and video_track:
-            if frame.pts is None:  # pragma: no cover
-                logger.warning(
-                    "MediaPlayer(%s) Skipping video frame with no pts", container.name
-                )
-                continue
-
-            # video from a webcam doesn't start at pts 0, cancel out offset
-            if video_first_pts is None:
-                video_first_pts = frame.pts
-            frame.pts -= video_first_pts
-
-            frame_time = frame.time
-            asyncio.run_coroutine_threadsafe(video_track._queue.put(frame), loop)
+    pass
 
 
 def player_worker_demux(
@@ -168,57 +108,7 @@ def player_worker_demux(
     throttle_playback: bool,
     loop_playback: bool,
 ) -> None:
-    video_first_pts = None
-    frame_time = None
-    start_time = time.time()
-
-    while not quit_event.is_set():
-        try:
-            packet = next(container.demux(*streams))
-            if not packet.size:
-                raise StopIteration
-        except Exception as exc:
-            if isinstance(exc, av.FFmpegError) and exc.errno == errno.EAGAIN:
-                time.sleep(0.01)
-                continue
-            if isinstance(exc, StopIteration) and loop_playback:
-                container.seek(0)
-                continue
-            if audio_track:
-                asyncio.run_coroutine_threadsafe(audio_track._queue.put(None), loop)
-            if video_track:
-                asyncio.run_coroutine_threadsafe(video_track._queue.put(None), loop)
-            break
-
-        # read up to 1 second ahead
-        if throttle_playback:
-            elapsed_time = time.time() - start_time
-            if frame_time and frame_time > elapsed_time + 1:
-                time.sleep(0.1)
-
-        track = None
-        if isinstance(packet.stream, AudioStream) and audio_track:
-            track = audio_track
-        elif isinstance(packet.stream, VideoStream) and video_track:
-            if packet.pts is None:  # pragma: no cover
-                logger.warning(
-                    "MediaPlayer(%s) Skipping video packet with no pts", container.name
-                )
-                continue
-            track = video_track
-
-            # video from a webcam doesn't start at pts 0, cancel out offset
-            if video_first_pts is None:
-                video_first_pts = packet.pts
-            packet.pts -= video_first_pts
-
-        if (
-            track is not None
-            and packet.pts is not None
-            and packet.time_base is not None
-        ):
-            frame_time = int(packet.pts * packet.time_base)
-            asyncio.run_coroutine_threadsafe(track._queue.put(packet), loop)
+    pass
 
 
 class PlayerStreamTrack(MediaStreamTrack):
@@ -354,14 +244,14 @@ class MediaPlayer:
         """
         A :class:`aiortc.MediaStreamTrack` instance if the file contains audio.
         """
-        return self.__audio
+        pass
 
     @property
     def video(self) -> Optional[MediaStreamTrack]:
         """
         A :class:`aiortc.MediaStreamTrack` instance if the file contains video.
         """
-        return self.__video
+        pass
 
     def _start(self, track: PlayerStreamTrack) -> None:
         self.__started.add(track)
@@ -444,28 +334,7 @@ class MediaRecorder:
 
         :param track: A :class:`aiortc.MediaStreamTrack`.
         """
-        stream: Union[AudioStream, VideoStream]
-        if track.kind == "audio":
-            if self.__container.format.name in ("wav", "alsa", "pulse"):
-                codec_name = "pcm_s16le"
-            elif self.__container.format.name == "mp3":
-                codec_name = "mp3"
-            elif self.__container.format.name in ("ogg", "opus", "webm"):
-                codec_name = "libopus"
-            else:
-                codec_name = "aac"
-            stream = cast(AudioStream, self.__container.add_stream(codec_name))
-        else:
-            if self.__container.format.name == "image2":
-                stream = self.__container.add_stream("png", rate=30)
-                stream.pix_fmt = "rgb24"
-            elif self.__container.format.name == "webm":
-                stream = self.__container.add_stream("libvpx", rate=30)
-                stream.pix_fmt = "yuv420p"
-            else:
-                stream = self.__container.add_stream("libx264", rate=30)
-                stream.pix_fmt = "yuv420p"
-        self.__tracks[track] = MediaRecorderContext(stream)
+        pass
 
     async def start(self) -> None:
         """
@@ -587,11 +456,7 @@ class MediaRelay:
 
         :rtype: :class: MediaStreamTrack
         """
-        proxy = RelayStreamTrack(self, track, buffered)
-        self.__log_debug("Create proxy %s for source %s", id(proxy), id(track))
-        if track not in self.__proxies:
-            self.__proxies[track] = set()
-        return proxy
+        pass
 
     def _start(self, proxy: RelayStreamTrack) -> None:
         track = proxy._source

@@ -165,7 +165,7 @@ class RTCCertificate:
         """
         The date and time after which the certificate will be considered invalid.
         """
-        return self._cert.not_valid_after_utc
+        pass
 
     def getFingerprints(self) -> list[RTCDtlsFingerprint]:
         """
@@ -261,15 +261,7 @@ class RtpRouter:
         payload_types: list[int],
         mid: Optional[str] = None,
     ) -> None:
-        self.receivers.add(receiver)
-        if mid is not None:
-            self.mid_table[mid] = receiver
-        for ssrc in ssrcs:
-            self.ssrc_table[ssrc] = receiver
-        for payload_type in payload_types:
-            if payload_type not in self.payload_type_table:
-                self.payload_type_table[payload_type] = set()
-            self.payload_type_table[payload_type].add(receiver)
+        pass
 
     def register_sender(self, sender: RtpSender, ssrc: int) -> None:
         self.senders[ssrc] = sender
@@ -394,7 +386,7 @@ class RTCDtlsTransport(AsyncIOEventEmitter):
         """
         The associated :class:`RTCIceTransport` instance.
         """
-        return self._transport
+        pass
 
     def getLocalParameters(self) -> RTCDtlsParameters:
         """
@@ -579,23 +571,7 @@ class RTCDtlsTransport(AsyncIOEventEmitter):
             self._set_state(State.CLOSED)
 
     def _get_stats(self) -> RTCStatsReport:
-        report = RTCStatsReport()
-        report.add(
-            RTCTransportStats(
-                # RTCStats
-                timestamp=clock.current_datetime(),
-                type="transport",
-                id=self._stats_id,
-                # RTCTransportStats,
-                packetsSent=self.__tx_packets,
-                packetsReceived=self.__rx_packets,
-                bytesSent=self.__tx_bytes,
-                bytesReceived=self.__rx_bytes,
-                iceRole=self.transport.role,
-                dtlsState=self.state,
-            )
-        )
-        return report
+        pass
 
     async def _handle_rtcp_data(self, data: bytes) -> None:
         try:
@@ -678,17 +654,7 @@ class RTCDtlsTransport(AsyncIOEventEmitter):
     def _register_rtp_receiver(
         self, receiver: RtpReceiver, parameters: RTCRtpReceiveParameters
     ) -> None:
-        ssrcs = set()
-        for encoding in parameters.encodings:
-            ssrcs.add(encoding.ssrc)
-
-        self._rtp_header_extensions_map.configure(parameters)
-        self._rtp_router.register_receiver(
-            receiver,
-            ssrcs=list(ssrcs),
-            payload_types=[codec.payloadType for codec in parameters.codecs],
-            mid=parameters.muxId,
-        )
+        pass
 
     def _register_rtp_sender(
         self, sender: RtpSender, parameters: RTCRtpSendParameters

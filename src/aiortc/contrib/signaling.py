@@ -88,10 +88,7 @@ class CopyAndPasteSignaling(BaseSignaling):
             self._reader = None
 
     async def receive(self) -> Optional[_SignalingObject]:
-        print("-- Please enter a message from remote party --")
-        data = await self._reader.readline()
-        print()
-        return object_from_string(data.decode(self._read_pipe.encoding))
+        pass
 
     async def send(self, descr: _SignalingObject) -> None:
         print("-- Please send this message to the remote party --")
@@ -121,9 +118,7 @@ class TcpSocketSignaling(BaseSignaling):
             def client_connected(
                 reader: asyncio.StreamReader, writer: asyncio.StreamWriter
             ) -> None:
-                self._reader = reader
-                self._writer = writer
-                connected.set()
+                pass
 
             self._server = await asyncio.start_server(
                 client_connected, host=self._host, port=self._port
@@ -145,12 +140,7 @@ class TcpSocketSignaling(BaseSignaling):
             self._server = None
 
     async def receive(self) -> Optional[_SignalingObject]:
-        await self._connect(False)
-        try:
-            data = await self._reader.readuntil()
-        except asyncio.IncompleteReadError:
-            return None
-        return object_from_string(data.decode("utf8"))
+        pass
 
     async def send(self, descr: _SignalingObject) -> None:
         await self._connect(True)
@@ -178,9 +168,7 @@ class UnixSocketSignaling(BaseSignaling):
             def client_connected(
                 reader: asyncio.StreamReader, writer: asyncio.StreamWriter
             ) -> None:
-                self._reader = reader
-                self._writer = writer
-                connected.set()
+                pass
 
             self._server = await asyncio.start_unix_server(
                 client_connected, path=self._path
@@ -204,12 +192,7 @@ class UnixSocketSignaling(BaseSignaling):
                 os.unlink(self._path)
 
     async def receive(self) -> Optional[_SignalingObject]:
-        await self._connect(False)
-        try:
-            data = await self._reader.readuntil()
-        except asyncio.IncompleteReadError:
-            return None
-        return object_from_string(data.decode("utf8"))
+        pass
 
     async def send(self, descr: _SignalingObject) -> None:
         await self._connect(True)

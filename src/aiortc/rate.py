@@ -52,9 +52,7 @@ class AimdRateControl:
         """
         For testing purposes.
         """
-        self.current_bitrate = self._clamp_bitrate(bitrate, bitrate)
-        self.current_bitrate_initialized = True
-        self.last_change_ms = now_ms
+        pass
 
     def update(
         self,

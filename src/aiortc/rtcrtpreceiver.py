@@ -53,27 +53,7 @@ logger = logging.getLogger(__name__)
 def decoder_worker(
     loop: asyncio.AbstractEventLoop, input_q: queue.Queue, output_q: asyncio.Queue
 ) -> None:
-    codec_name = None
-    decoder = None
-
-    while True:
-        task = input_q.get()
-        if task is None:
-            # inform the track that is has ended
-            asyncio.run_coroutine_threadsafe(output_q.put(None), loop)
-            break
-        codec, encoded_frame = task
-
-        if codec.name != codec_name:
-            decoder = get_decoder(codec)
-            codec_name = codec.name
-
-        for frame in decoder.decode(encoded_frame):
-            # pass the decoded frame to the track
-            asyncio.run_coroutine_threadsafe(output_q.put(frame), loop)
-
-    if decoder is not None:
-        del decoder
+    pass
 
 
 class NackGenerator:
@@ -165,27 +145,19 @@ class StreamStatistics:
 
     @property
     def fraction_lost(self) -> int:
-        expected_interval = self.packets_expected - self._expected_prior
-        self._expected_prior = self.packets_expected
-        received_interval = self.packets_received - self._received_prior
-        self._received_prior = self.packets_received
-        lost_interval = expected_interval - received_interval
-        if expected_interval == 0 or lost_interval <= 0:
-            return 0
-        else:
-            return (lost_interval << 8) // expected_interval
+        pass
 
     @property
     def jitter(self) -> int:
-        return self._jitter_q4 >> 4
+        pass
 
     @property
     def packets_expected(self) -> int:
-        return self.cycles + self.max_seq - self.base_seq + 1
+        pass
 
     @property
     def packets_lost(self) -> int:
-        return clamp_packets_lost(self.packets_expected - self.packets_received)
+        pass
 
 
 class RemoteStreamTrack(MediaStreamTrack):
@@ -216,15 +188,7 @@ class TimestampMapper:
         self._origin: Optional[int] = None
 
     def map(self, timestamp: int) -> int:
-        if self._origin is None:
-            # first timestamp
-            self._origin = timestamp
-        elif timestamp < self._last:
-            # RTP timestamp wrapped
-            self._origin -= 1 << 32
-
-        self._last = timestamp
-        return timestamp - self._origin
+        pass
 
 
 @dataclass
@@ -308,7 +272,7 @@ class RTCRtpReceiver:
         """
         The :class:`MediaStreamTrack` which is being handled by the receiver.
         """
-        return self._track
+        pass
 
     @property
     def transport(self) -> RTCDtlsTransport:
@@ -316,7 +280,7 @@ class RTCRtpReceiver:
         The :class:`RTCDtlsTransport` over which the media for the receiver's
         track is received.
         """
-        return self.__transport
+        pass
 
     @classmethod
     def getCapabilities(self, kind: str) -> Optional[RTCRtpCapabilities]:
@@ -326,7 +290,7 @@ class RTCRtpReceiver:
 
         :rtype: :class:`RTCRtpCapabilities`
         """
-        return get_capabilities(kind)
+        pass
 
     async def getStats(self) -> RTCStatsReport:
         """
@@ -334,41 +298,14 @@ class RTCRtpReceiver:
 
         :rtype: :class:`RTCStatsReport`
         """
-        for ssrc, stream in self.__remote_streams.items():
-            self.__stats.add(
-                RTCInboundRtpStreamStats(
-                    # RTCStats
-                    timestamp=clock.current_datetime(),
-                    type="inbound-rtp",
-                    id="inbound-rtp_" + str(id(self)),
-                    # RTCStreamStats
-                    ssrc=ssrc,
-                    kind=self.__kind,
-                    transportId=self.transport._stats_id,
-                    # RTCReceivedRtpStreamStats
-                    packetsReceived=stream.packets_received,
-                    packetsLost=stream.packets_lost,
-                    jitter=stream.jitter,
-                    # RTPInboundRtpStreamStats
-                )
-            )
-        self.__stats.update(self.transport._get_stats())
-
-        return self.__stats
+        pass
 
     def getSynchronizationSources(self) -> list[RTCRtpSynchronizationSource]:
         """
         Returns a :class:`RTCRtpSynchronizationSource` for each unique SSRC identifier
         received in the last 10 seconds.
         """
-        cutoff = clock.current_datetime() - datetime.timedelta(seconds=10)
-        sources = []
-        for source, timestamp in self.__active_ssrc.items():
-            if timestamp >= cutoff:
-                sources.append(
-                    RTCRtpSynchronizationSource(source=source, timestamp=timestamp)
-                )
-        return sources
+        pass
 
     async def receive(self, parameters: RTCRtpReceiveParameters) -> None:
         """
@@ -376,31 +313,10 @@ class RTCRtpReceiver:
 
         :param parameters: The :class:`RTCRtpParameters` for the receiver.
         """
-        if not self.__started:
-            for codec in parameters.codecs:
-                self.__codecs[codec.payloadType] = codec
-            for encoding in parameters.encodings:
-                if encoding.rtx:
-                    self.__rtx_ssrc[encoding.rtx.ssrc] = encoding.ssrc
-
-            # start decoder thread
-            self.__decoder_thread = threading.Thread(
-                target=decoder_worker,
-                name=self.__kind + "-decoder",
-                args=(
-                    asyncio.get_event_loop(),
-                    self.__decoder_queue,
-                    self._track._queue,
-                ),
-            )
-            self.__decoder_thread.start()
-
-            self.__transport._register_rtp_receiver(self, parameters)
-            self.__rtcp_task = asyncio.ensure_future(self._run_rtcp())
-            self.__started = True
+        pass
 
     def setTransport(self, transport: RTCDtlsTransport) -> None:
-        self.__transport = transport
+        pass
 
     async def stop(self) -> None:
         """
@@ -612,7 +528,7 @@ class RTCRtpReceiver:
             await self._send_rtcp(packet)
 
     def _set_rtcp_ssrc(self, ssrc: int) -> None:
-        self.__rtcp_ssrc = ssrc
+        pass
 
     def __stop_decoder(self) -> None:
         """

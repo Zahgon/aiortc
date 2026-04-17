@@ -155,8 +155,7 @@ def ipaddress_from_sdp(sdp: str) -> str:
 
 
 def ipaddress_to_sdp(addr: str) -> str:
-    version = ipaddress.ip_address(addr).version
-    return f"IN IP{version} {addr}"
+    pass
 
 
 def parameters_from_sdp(sdp: str) -> ParametersDict:
@@ -174,13 +173,7 @@ def parameters_from_sdp(sdp: str) -> ParametersDict:
 
 
 def parameters_to_sdp(parameters: ParametersDict) -> str:
-    params = []
-    for param_k, param_v in parameters.items():
-        if param_v is not None:
-            params.append(f"{param_k}={param_v}")
-        else:
-            params.append(param_k)
-    return ";".join(params)
+    pass
 
 
 def parse_attr(line: str) -> tuple[str, Optional[str]]:
@@ -564,15 +557,7 @@ class SessionDescription:
         return session
 
     def webrtc_track_id(self, media: MediaDescription) -> Optional[str]:
-        assert media in self.media
-        if media.msid is not None and " " in media.msid:
-            bits = media.msid.split()
-            for group in self.msid_semantic:
-                if group.semantic == "WMS" and (
-                    bits[0] in group.items or "*" in group.items
-                ):
-                    return bits[1]
-        return None
+        pass
 
     def __str__(self) -> str:
         lines = [f"v={self.version}", f"o={self.origin}", f"s={self.name}"]

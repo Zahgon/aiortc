@@ -87,36 +87,32 @@ class RTCDataChannel(AsyncIOEventEmitter):
         """
         The number of bytes of data currently queued to be sent over the data channel.
         """
-        return self.__bufferedAmount
+        pass
 
     @property
     def bufferedAmountLowThreshold(self) -> int:
         """
         The number of bytes of buffered outgoing data that is considered "low".
         """
-        return self.__bufferedAmountLowThreshold
+        pass
 
     @bufferedAmountLowThreshold.setter
     def bufferedAmountLowThreshold(self, value: int) -> None:
-        if value < 0 or value > 4294967295:
-            raise ValueError(
-                "bufferedAmountLowThreshold must be in range 0 - 4294967295"
-            )
-        self.__bufferedAmountLowThreshold = value
+        pass
 
     @property
     def negotiated(self) -> bool:
         """
         Whether data channel was negotiated out-of-band.
         """
-        return self.__parameters.negotiated
+        pass
 
     @property
     def id(self) -> Optional[int]:
         """
         An ID number which uniquely identifies the data channel.
         """
-        return self.__id
+        pass
 
     @property
     def label(self) -> str:
@@ -125,7 +121,7 @@ class RTCDataChannel(AsyncIOEventEmitter):
 
         These labels are not required to be unique.
         """
-        return self.__parameters.label
+        pass
 
     @property
     def ordered(self) -> bool:
@@ -133,42 +129,42 @@ class RTCDataChannel(AsyncIOEventEmitter):
         Indicates whether or not the data channel guarantees in-order delivery of
         messages.
         """
-        return self.__parameters.ordered
+        pass
 
     @property
     def maxPacketLifeTime(self) -> Optional[int]:
         """
         The maximum time in milliseconds during which transmissions are attempted.
         """
-        return self.__parameters.maxPacketLifeTime
+        pass
 
     @property
     def maxRetransmits(self) -> Optional[int]:
         """
         "The maximum number of retransmissions that are attempted.
         """
-        return self.__parameters.maxRetransmits
+        pass
 
     @property
     def protocol(self) -> str:
         """
         The name of the subprotocol in use.
         """
-        return self.__parameters.protocol
+        pass
 
     @property
     def readyState(self) -> str:
         """
         A string indicating the current state of the underlying data transport.
         """
-        return self.__readyState
+        pass
 
     @property
     def transport(self) -> "RTCSctpTransport":
         """
         The :class:`RTCSctpTransport` over which data is transmitted.
         """
-        return self.__transport
+        pass
 
     def close(self) -> None:
         """

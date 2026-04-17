@@ -64,33 +64,11 @@ class RTCIceParameters:
 
 
 def candidate_from_aioice(x: Candidate) -> RTCIceCandidate:
-    return RTCIceCandidate(
-        component=x.component,
-        foundation=x.foundation,
-        ip=x.host,
-        port=x.port,
-        priority=x.priority,
-        protocol=x.transport,
-        relatedAddress=x.related_address,
-        relatedPort=x.related_port,
-        tcpType=x.tcptype,
-        type=x.type,
-    )
+    pass
 
 
 def candidate_to_aioice(x: RTCIceCandidate) -> Candidate:
-    return Candidate(
-        component=x.component,
-        foundation=x.foundation,
-        host=x.ip,
-        port=x.port,
-        priority=x.priority,
-        related_address=x.relatedAddress,
-        related_port=x.relatedPort,
-        transport=x.protocol,
-        tcptype=x.tcpType,
-        type=x.type,
-    )
+    pass
 
 
 def connection_kwargs(servers: list[RTCIceServer]) -> dict[str, Any]:
@@ -230,7 +208,7 @@ class RTCIceGatherer(AsyncIOEventEmitter):
         Retrieve the list of valid local candidates associated with the ICE
         gatherer.
         """
-        return [candidate_from_aioice(x) for x in self._connection.local_candidates]
+        pass
 
     def getLocalParameters(self) -> RTCIceParameters:
         """
@@ -275,7 +253,7 @@ class RTCIceTransport(AsyncIOEventEmitter):
         """
         The ICE gatherer passed in the constructor.
         """
-        return self.__iceGatherer
+        pass
 
     @property
     def role(self) -> str:
@@ -284,10 +262,7 @@ class RTCIceTransport(AsyncIOEventEmitter):
 
         Either `'controlling'` or `'controlled'`.
         """
-        if self._connection.ice_controlling:
-            return "controlling"
-        else:
-            return "controlled"
+        pass
 
     @property
     def state(self) -> str:
@@ -302,21 +277,14 @@ class RTCIceTransport(AsyncIOEventEmitter):
 
         :param candidate: The new candidate or `None` to signal end of candidates.
         """
-        if not self.__iceGatherer._remote_candidates_end:
-            if candidate is None:
-                self.__iceGatherer._remote_candidates_end = True
-                await self._connection.add_remote_candidate(None)
-            else:
-                await self._connection.add_remote_candidate(
-                    candidate_to_aioice(candidate)
-                )
+        pass
 
     def getRemoteCandidates(self) -> list[RTCIceCandidate]:
         """
         Retrieve the list of candidates associated with the remote
         :class:`RTCIceTransport`.
         """
-        return [candidate_from_aioice(x) for x in self._connection.remote_candidates]
+        pass
 
     async def start(self, remoteParameters: RTCIceParameters) -> None:
         """

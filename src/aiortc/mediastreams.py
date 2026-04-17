@@ -45,11 +45,11 @@ class MediaStreamTrack(AsyncIOEventEmitter, metaclass=ABCMeta):
         """
         An automatically generated globally unique ID.
         """
-        return self._id
+        pass
 
     @property
     def readyState(self) -> str:
-        return "ended" if self.__ended else "live"
+        pass
 
     @abstractmethod
     async def recv(self) -> Union[Frame, Packet]:

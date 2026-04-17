@@ -257,12 +257,11 @@ class Vp8Encoder(Encoder):
         """
         Target bitrate in bits per second.
         """
-        return self.__target_bitrate
+        pass
 
     @target_bitrate.setter
     def target_bitrate(self, bitrate: int) -> None:
-        bitrate = max(MIN_BITRATE, min(bitrate, MAX_BITRATE))
-        self.__target_bitrate = bitrate
+        pass
 
     @classmethod
     def _packetize(cls, buffer: bytes, picture_id: int) -> list[bytes]:

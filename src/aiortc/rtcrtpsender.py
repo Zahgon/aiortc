@@ -137,14 +137,14 @@ class RTCRtpSender:
 
     @property
     def kind(self) -> str:
-        return self.__kind
+        pass
 
     @property
     def track(self) -> MediaStreamTrack:
         """
         The :class:`MediaStreamTrack` which is being handled by the sender.
         """
-        return self.__track
+        pass
 
     @property
     def transport(self) -> RTCDtlsTransport:
@@ -152,7 +152,7 @@ class RTCRtpSender:
         The :class:`RTCDtlsTransport` over which media data for the track is
         transmitted.
         """
-        return self.__transport
+        pass
 
     @classmethod
     def getCapabilities(self, kind: str) -> RTCRtpCapabilities:
@@ -162,7 +162,7 @@ class RTCRtpSender:
 
         :rtype: :class:`RTCRtpCapabilities`
         """
-        return get_capabilities(kind)
+        pass
 
     async def getStats(self) -> RTCStatsReport:
         """
@@ -170,26 +170,7 @@ class RTCRtpSender:
 
         :rtype: :class:`RTCStatsReport`
         """
-        self.__stats.add(
-            RTCOutboundRtpStreamStats(
-                # RTCStats
-                timestamp=clock.current_datetime(),
-                type="outbound-rtp",
-                id="outbound-rtp_" + str(id(self)),
-                # RTCStreamStats
-                ssrc=self._ssrc,
-                kind=self.__kind,
-                transportId=self.transport._stats_id,
-                # RTCSentRtpStreamStats
-                packetsSent=self.__packet_count,
-                bytesSent=self.__octet_count,
-                # RTCOutboundRtpStreamStats
-                trackId=str(id(self.track)),
-            )
-        )
-        self.__stats.update(self.transport._get_stats())
-
-        return self.__stats
+        pass
 
     def replaceTrack(self, track: Optional[MediaStreamTrack]) -> None:
         self.__track = track
@@ -199,7 +180,7 @@ class RTCRtpSender:
             self._track_id = str(uuid.uuid4())
 
     def setTransport(self, transport: RTCDtlsTransport) -> None:
-        self.__transport = transport
+        pass
 
     async def send(self, parameters: RTCRtpSendParameters) -> None:
         """

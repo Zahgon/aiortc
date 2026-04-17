@@ -52,7 +52,7 @@ class RTCRtpTransceiver:
 
         One of `'sendrecv'`, `'sendonly'`, `'recvonly'`, `'inactive'` or `None`.
         """
-        return self.__currentDirection
+        pass
 
     @property
     def direction(self) -> str:
@@ -63,20 +63,19 @@ class RTCRtpTransceiver:
 
         One of `'sendrecv'`, `'sendonly'`, `'recvonly'` or `'inactive'`.
         """
-        return self.__direction
+        pass
 
     @direction.setter
     def direction(self, direction: str) -> None:
-        assert direction in DIRECTIONS
-        self.__direction = direction
+        pass
 
     @property
     def kind(self) -> str:
-        return self.__kind
+        pass
 
     @property
     def mid(self) -> Optional[str]:
-        return self.__mid
+        pass
 
     @property
     def receiver(self) -> RTCRtpReceiver:
@@ -84,7 +83,7 @@ class RTCRtpTransceiver:
         The :class:`RTCRtpReceiver` that handles receiving and decoding
         incoming media.
         """
-        return self.__receiver
+        pass
 
     @property
     def sender(self) -> RTCRtpSender:
@@ -92,11 +91,11 @@ class RTCRtpTransceiver:
         The :class:`RTCRtpSender` responsible for encoding and sending
         data to the remote peer.
         """
-        return self.__sender
+        pass
 
     @property
     def stopped(self) -> bool:
-        return self.__stopped
+        pass
 
     def setCodecPreferences(self, codecs: list[RTCRtpCodecCapability]) -> None:
         """
@@ -108,17 +107,7 @@ class RTCRtpTransceiver:
         :param codecs: A list of :class:`RTCRtpCodecCapability`, in decreasing order
                         of preference. If empty, restores the default preferences.
         """
-        if not codecs:
-            self._preferred_codecs = []
-
-        capabilities = get_capabilities(self.kind).codecs
-        unique: list[RTCRtpCodecCapability] = []
-        for codec in reversed(codecs):
-            if codec not in capabilities:
-                raise ValueError("Codec is not in capabilities")
-            if codec not in unique:
-                unique.insert(0, codec)
-        self._preferred_codecs = unique
+        pass
 
     async def stop(self) -> None:
         """
@@ -129,26 +118,13 @@ class RTCRtpTransceiver:
         self.__stopped = True
 
     def _setCurrentDirection(self, direction: str) -> None:
-        self.__currentDirection = direction
-
-        if direction == "sendrecv":
-            self.__sender._enabled = True
-            self.__receiver._enabled = True
-        elif direction == "sendonly":
-            self.__sender._enabled = True
-            self.__receiver._enabled = False
-        elif direction == "recvonly":
-            self.__sender._enabled = False
-            self.__receiver._enabled = True
-        elif direction == "inactive":
-            self.__sender._enabled = False
-            self.__receiver._enabled = False
+        pass
 
     def _set_mid(self, mid: str) -> None:
-        self.__mid = mid
+        pass
 
     def _get_mline_index(self) -> Optional[int]:
-        return self.__mline_index
+        pass
 
     def _set_mline_index(self, idx: int) -> None:
-        self.__mline_index = idx
+        pass

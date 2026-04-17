@@ -98,56 +98,7 @@ class HeaderExtensionsMap:
         return values
 
     def set(self, values: HeaderExtensions) -> tuple[int, bytes]:
-        extensions = []
-        if values.mid is not None and self.__ids.mid:
-            extensions.append((self.__ids.mid, values.mid.encode("utf8")))
-        if (
-            values.repaired_rtp_stream_id is not None
-            and self.__ids.repaired_rtp_stream_id
-        ):
-            extensions.append(
-                (
-                    self.__ids.repaired_rtp_stream_id,
-                    values.repaired_rtp_stream_id.encode("ascii"),
-                )
-            )
-        if values.rtp_stream_id is not None and self.__ids.rtp_stream_id:
-            extensions.append(
-                (self.__ids.rtp_stream_id, values.rtp_stream_id.encode("ascii"))
-            )
-        if values.abs_send_time is not None and self.__ids.abs_send_time:
-            extensions.append(
-                (self.__ids.abs_send_time, pack("!L", values.abs_send_time)[1:])
-            )
-        if values.transmission_offset is not None and self.__ids.transmission_offset:
-            extensions.append(
-                (
-                    self.__ids.transmission_offset,
-                    pack("!l", values.transmission_offset << 8)[0:2],
-                )
-            )
-        if values.audio_level is not None and self.__ids.audio_level:
-            extensions.append(
-                (
-                    self.__ids.audio_level,
-                    pack(
-                        "!B",
-                        (0x80 if values.audio_level[0] else 0)
-                        | (values.audio_level[1] & 0x7F),
-                    ),
-                )
-            )
-        if (
-            values.transport_sequence_number is not None
-            and self.__ids.transport_sequence_number
-        ):
-            extensions.append(
-                (
-                    self.__ids.transport_sequence_number,
-                    pack("!H", values.transport_sequence_number),
-                )
-            )
-        return pack_header_extensions(extensions)
+        pass
 
 
 def clamp_packets_lost(count: int) -> int:
@@ -167,8 +118,7 @@ def unpack_packets_lost(d: bytes) -> int:
 
 
 def pack_rtcp_packet(packet_type: int, count: int, payload: bytes) -> bytes:
-    assert len(payload) % 4 == 0
-    return pack("!BBH", (2 << 6) | count, packet_type, len(payload) // 4) + payload
+    pass
 
 
 def pack_remb_fci(bitrate: int, ssrcs: list[int]) -> bytes:
